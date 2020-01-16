@@ -103,6 +103,17 @@ Character field_separator_<%=cid %> = (<%=field_separator%>).charAt(0);
         callStmt_<%=cid%> = conn_<%=cid%>.prepareCall(sql_<%=cid%>);
         callStmt_<%=cid%>.setString(1, param_<%=cid%>);
         callStmt_<%=cid%>.execute();
+        java.sql.ResultSet rs = callStmt_<%=cid%>.getResultSet();
+        String mgsSQL = null;
+        if(rs.next()){
+        	mgsSQL = rs.getString("MSG_RETRIEVAL");
+        }
+        callStmt_<%=cid%> = conn_<%=cid%>.prepareCall(mgsSQL);
+        callStmt_<%=cid%>.execute();
+        java.sql.ResultSet rs2 = callStmt_<%=cid%>.getResultSet();
+        while(rs2.next()){
+        	System.out.println(">>>>>>>>>>>>>>"+rs2.getString(1)+"  "+rs2.getString(2));
+        }
         callStmt_<%=cid%>.close();
         <%
         if(isLog4jEnabled_tableAction){
