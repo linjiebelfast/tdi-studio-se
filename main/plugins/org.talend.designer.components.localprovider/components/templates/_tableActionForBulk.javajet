@@ -31,7 +31,7 @@ if (!isParallelize) {
 			<%
 			if (isDynamic){
 			%>
-				<%@ include file="./createTableBasedOnDynamicColumn.javajet"%>
+				<%@ include file="./createTableFromDynamicInBulkExec.javajet"%>
 			<%
 			} else {
 			%>
@@ -55,7 +55,7 @@ if (!isParallelize) {
 			<%
 			if (isDynamic){
 			%>
-				<%@ include file="./createTableBasedOnDynamicColumn.javajet"%>
+				<%@ include file="./createTableFromDynamicInBulkExec.javajet"%>
 			<%
 			} else {
 			%>
@@ -233,7 +233,7 @@ if (!isParallelize) {
 					<%
 					if (isDynamic){
 					%>
-						<%@ include file="./createTableBasedOnDynamicColumn.javajet"%>
+						<%@ include file="./createTableFromDynamicInBulkExec.javajet"%>
 					<%
 					} else {
 					%>
@@ -267,7 +267,7 @@ if (!isParallelize) {
 				<%
 				if (isDynamic){
 				%>
-					<%@ include file="./createTableBasedOnDynamicColumn.javajet"%>
+					<%@ include file="./createTableFromDynamicInBulkExec.javajet"%>
 				<%
 				} else {
 				%>
