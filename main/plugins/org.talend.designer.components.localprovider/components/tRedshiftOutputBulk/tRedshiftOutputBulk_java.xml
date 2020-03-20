@@ -140,7 +140,6 @@
 	      NAME="SESSION_DURATION"
 	      FIELD="TEXT"
 	      NUM_ROW="75"
-	      REQUIRED="true"
 	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true')"
 	      GROUP="S3_CONFIG"
 	    >
@@ -182,26 +181,6 @@
 	    	</ITEMS>
 	    </PARAMETER>
 	    
-	    <PARAMETER
-	      NAME="SET_STS_ENDPOINT"
-	      FIELD="CHECK"
-	      NUM_ROW="85"
-	      NB_LINES="5"
-	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true')"
-	      GROUP="S3_CONFIG"
-	    >
-	    </PARAMETER>
-	    <PARAMETER
-	      NAME="STS_ENDPOINT"
-	      FIELD="TEXT"
-	      NUM_ROW="90"
-	      REQUIRED="true"
-	      SHOW_IF="(ASSUME_ROLE == 'true') AND (SET_STS_ENDPOINT == 'true')"
-	      GROUP="S3_CONFIG"
-	    >
-	      <DEFAULT>""</DEFAULT>
-	    </PARAMETER>   
-
 		<PARAMETER NAME="BUCKET" FIELD="TEXT" NUM_ROW="100" REQUIRED="true"
 			GROUP="S3_CONFIG">
 			<DEFAULT>""</DEFAULT>
@@ -281,6 +260,114 @@
 				<ITEM NAME="VALUE" />
 			</ITEMS>
 		</PARAMETER>
+		
+		<PARAMETER
+	      NAME="CONFIG_ASSUME_ROLE"
+	      FIELD="CHECK"
+	      NUM_ROW="50"
+	      NB_LINES="5"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true')"
+	    >
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="SIGNING_REGION"
+	      FIELD="TEXT"
+	      NUM_ROW="51"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      REQUIRED="true"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	      <DEFAULT>""</DEFAULT>
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="SET_STS_ENDPOINT"
+	      FIELD="CHECK"
+	      NUM_ROW="52"
+	      NB_LINES="5"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	    </PARAMETER>
+	    
+		<PARAMETER
+	      NAME="STS_ENDPOINT"
+	      FIELD="TEXT"
+	      NUM_ROW="52"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true') AND (SET_STS_ENDPOINT == 'true')"
+	    >
+	      <DEFAULT>""</DEFAULT>
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="EXTERNALID"
+	      FIELD="TEXT"
+	      NUM_ROW="53"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	      <DEFAULT>""</DEFAULT>
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="SERIALNUMBER"
+	      FIELD="TEXT"
+	      NUM_ROW="54"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	      <DEFAULT>""</DEFAULT>
+	    </PARAMETER>
+	    
+	     <PARAMETER
+	      NAME="TOKENCODE"
+	      FIELD="TEXT"
+	      NUM_ROW="55"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	      <DEFAULT>""</DEFAULT>
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="TAGS"
+	      FIELD="TABLE"
+	      NUM_ROW="56"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	      <ITEMS>
+	      	<ITEM NAME="TAG_KEY" FIELD="TEXT" />
+	      	<ITEM NAME="TAG_VALUE" FIELD="TEXT" />
+	      	<ITEM NAME="TAG_TRANSITIVE" FIELD="CHECK" VALUE="FALSE"/>
+	      </ITEMS>
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="POLICY_TABLE"
+	      FIELD="TABLE"
+	      NUM_ROW="57"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	   		<ITEMS>
+	    		<ITEM NAME="POLICY_ARN" VALUE="" />
+	   		</ITEMS>
+	    </PARAMETER>
+	    
+	    <PARAMETER
+	      NAME="POLICY"
+	      FIELD="MEMO"
+	      NUM_ROW="58"
+	      GROUP="ASSUME_ROLE_CONFIG"
+	      NB_LINES="15"
+	      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+	    >
+	      <DEFAULT>""</DEFAULT>
+	    </PARAMETER>
 	</ADVANCED_PARAMETERS>
 
 	<CODEGENERATION>

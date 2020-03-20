@@ -112,7 +112,6 @@
       NAME="SESSION_DURATION"
       FIELD="TEXT"
       NUM_ROW="25"
-      REQUIRED="true"
       GROUP="CONNECTION_CONFIG"
       SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true')"
     >
@@ -216,18 +215,109 @@
     </PARAMETER>
     
     <PARAMETER
-      NAME="SET_STS_ENDPOINT"
+      NAME="CONFIG_ASSUME_ROLE"
       FIELD="CHECK"
-      NUM_ROW="35"
+      NUM_ROW="40"
+      NB_LINES="5"
+      GROUP="ASSUME_ROLE_CONFIG"
       SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true')"
     >
     </PARAMETER>
+    
+    <PARAMETER
+      NAME="SIGNING_REGION"
+      FIELD="TEXT"
+      NUM_ROW="41"
+      GROUP="ASSUME_ROLE_CONFIG"
+      REQUIRED="true"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+      <DEFAULT>""</DEFAULT>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="SET_STS_ENDPOINT"
+      FIELD="CHECK"
+      NUM_ROW="42"
+      NB_LINES="5"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+    </PARAMETER>
+    
 	<PARAMETER
       NAME="STS_ENDPOINT"
       FIELD="TEXT"
-      NUM_ROW="35"
-      REQUIRED="true"
-      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (SET_STS_ENDPOINT == 'true')"
+      NUM_ROW="42"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true') AND (SET_STS_ENDPOINT == 'true')"
+    >
+      <DEFAULT>""</DEFAULT>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="EXTERNALID"
+      FIELD="TEXT"
+      NUM_ROW="43"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+      <DEFAULT>""</DEFAULT>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="SERIALNUMBER"
+      FIELD="TEXT"
+      NUM_ROW="44"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+      <DEFAULT>""</DEFAULT>
+    </PARAMETER>
+    
+     <PARAMETER
+      NAME="TOKENCODE"
+      FIELD="TEXT"
+      NUM_ROW="45"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+      <DEFAULT>""</DEFAULT>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="TAGS"
+      FIELD="TABLE"
+      NUM_ROW="46"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+      <ITEMS>
+      	<ITEM NAME="TAG_KEY" FIELD="TEXT" />
+      	<ITEM NAME="TAG_VALUE" FIELD="TEXT" />
+      	<ITEM NAME="TAG_TRANSITIVE" FIELD="CHECK" VALUE="FALSE"/>
+      </ITEMS>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="POLICY_TABLE"
+      FIELD="TABLE"
+      NUM_ROW="47"
+      GROUP="ASSUME_ROLE_CONFIG"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
+    >
+   		<ITEMS>
+    		<ITEM NAME="POLICY_ARN" VALUE="" />
+   		</ITEMS>
+    </PARAMETER>
+    
+    <PARAMETER
+      NAME="POLICY"
+      FIELD="MEMO"
+      NUM_ROW="48"
+      GROUP="ASSUME_ROLE_CONFIG"
+      NB_LINES="15"
+      SHOW_IF="isShow[ASSUME_ROLE] AND (ASSUME_ROLE == 'true') AND (CONFIG_ASSUME_ROLE == 'true')"
     >
       <DEFAULT>""</DEFAULT>
     </PARAMETER>
