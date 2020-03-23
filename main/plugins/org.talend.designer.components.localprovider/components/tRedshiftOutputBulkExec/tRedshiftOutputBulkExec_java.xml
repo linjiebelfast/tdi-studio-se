@@ -202,7 +202,6 @@
           NAME="SESSION_DURATION"
           FIELD="TEXT"
           NUM_ROW="75"
-          REQUIRED="true"
           SHOW_IF="isShow[ASSUME_ROLE_S3] AND (ASSUME_ROLE_S3 == 'true')"
           GROUP="S3_CONFIG"
         >
