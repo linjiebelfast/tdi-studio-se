@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.jface.fieldassist.DecoratedField;
 import org.eclipse.jface.fieldassist.FieldDecoration;
@@ -290,10 +290,11 @@ public class ComponentRefController extends AbstractElementPropertySectionContro
 
         // First item is this component (see also createComboCommand)
         // FIXME - I18N for this message
-        String componentName = currentNode.getComponent().getName();
-        if (!ArrayUtils.contains(componentsName, componentName)) {
-            itemsLabel.add("Use this Component"); //$NON-NLS-1$
+        String showName = "Use this Component"; //$NON-NLS-1$
+        if (ArrayUtils.contains(componentsName, currentNode.getComponent().getName())) {
+            showName = "<none>"; //$NON-NLS-1$
         }
+        itemsLabel.add(showName);
         itemsValue.add(currentNode.getUniqueName());
         String selectedValue;
         Object referenceType = props.referenceType.getValue();
@@ -331,9 +332,7 @@ public class ComponentRefController extends AbstractElementPropertySectionContro
             String iValue = itemsValue.get(i);
             if ((selectedValue == null && (((INode) elem).getUniqueName()).equals(iValue))
                     || (selectedValue != null && StringUtils.isNotEmpty(iValue) && iValue.endsWith(selectedValue))) {
-                if (itemsLabel.size() > 0) {
-                    iLabel = itemsLabel.get(i);
-                }
+                iLabel = itemsLabel.get(i);
                 break;
             }
             selection++;
