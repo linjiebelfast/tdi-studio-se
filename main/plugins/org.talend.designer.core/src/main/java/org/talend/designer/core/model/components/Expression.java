@@ -277,7 +277,7 @@ public final class Expression {
             return evaluateSparkVersion(simpleExpression, listParam, currentParam);
         }
         
-        if ((simpleExpression.contains("CONTAINS"))) { //$NON-NLS-1$
+        if ((simpleExpression.contains(CONTAINS))) { //$NON-NLS-1$
             return evaluateContains(simpleExpression, listParam);
         }
 
