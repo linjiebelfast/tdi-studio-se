@@ -1045,6 +1045,7 @@ public final class Expression {
         }
         String paramName = splitted[0].trim();
         String paramValue = splitted[1].trim();
+        
         //Look for the param name in list
         IElementParameter param = listParam.stream()
                 .filter(p -> paramName.equals(p.getName()))
@@ -1053,10 +1054,6 @@ public final class Expression {
         if (param == null || ! EParameterFieldType.TABLE.equals(param.getFieldType())) {
             return false;
         }
-
-        System.out.println(paramValue);
-        ((List<Map<String, Object>>) param.getValue()).stream()
-        .forEach(l -> System.out.println(l.toString()));
         
         // Check if we can find paraValue among table lines
         return ((List<Map<String, Object>>) param.getValue()).stream()
