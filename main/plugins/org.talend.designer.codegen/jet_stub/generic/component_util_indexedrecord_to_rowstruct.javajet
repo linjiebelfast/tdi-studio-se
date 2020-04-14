@@ -118,7 +118,7 @@ class IndexedRecordToRowStructGenerator {
                     // set name
                     dynamicMetadata_<%=cid%>.setName(dynamicField_<%=cid%>.name());
                     // set db name
-                    dynamicMetadata_<%=cid%>.setDbName(dynamicField_<%=cid%>.name());
+                    dynamicMetadata_<%=cid%>.setDbName(dynamicField_<%=cid%>.getProp("talend.field.dbColumnName"));
                     // set nullable
                     if (org.talend.daikon.avro.AvroUtils.isNullable(dynamicFieldSchema_<%=cid%>)) {
                         dynamicMetadata_<%=cid%>.setNullable(true);
