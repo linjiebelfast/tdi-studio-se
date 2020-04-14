@@ -937,7 +937,6 @@ this.globalResumeTicket = true;//to run tPreJob
  }
 %>
 
-
 <%
         //4. flush the begin msg
         for (INode statCatcherNode : process.getNodesOfType("tStatCatcher")) {
