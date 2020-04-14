@@ -16,8 +16,10 @@ package org.talend.sdk.component.studio.provider;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
@@ -45,14 +49,17 @@ import org.talend.designer.core.utils.UnifiedComponentUtil;
 import org.talend.repository.documentation.ExportFileResource;
 import org.talend.sdk.component.studio.ComponentModel;
 
+//TODO: refactorings and code cleanup... this is WIP! ;-)
 public class TacokitExportDependenciesProvider implements IBuildExportDependenciesProvider {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(TacokitExportDependenciesProvider.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(TacokitExportDependenciesProvider.class.getName());
 
     /**
      * Called when exporting a job, this is up to the implementor to check that the item should export the dependencies.
      *
      * We use this interface as a hook to feed MAVEN-INF repository and do not respect the contract, but this will do the job.
+     *
+     * Side-note: this method is called every time we have an ESB job export as Microservice export also calls it.
      *
      * @param exportFileResource unused see above for explanations.
      * @param item
@@ -64,7 +71,7 @@ public class TacokitExportDependenciesProvider implements IBuildExportDependenci
         if (!BuildExportManager.getInstance().getCurrentExportType().equals(EXPORT_TYPE.OSGI)) {
             return;
         }
-        LOGGER.debug("[exportDependencies] Searching for TaCoKit components...");
+        LOG.debug("[exportDependencies] Searching for TaCoKit components...");
         final Map<String, String> plugins = new HashMap<String, String>();
         final EList<?> nodes = ProcessItem.class.cast(item).getProcess().getNode();
         final String DI = ComponentCategory.CATEGORY_4_DI.getName();
@@ -84,7 +91,7 @@ public class TacokitExportDependenciesProvider implements IBuildExportDependenci
                 .forEach(id -> {
                     plugins.put(id.getPlugin(), gavToJar(id.getPluginLocation()));
                 });
-        LOGGER.info("[exportDependencies] Found {} TaCoKit components.", plugins.size());
+        LOG.info("[exportDependencies] Found {} TaCoKit components.", plugins.size());
         if (plugins.isEmpty()) {
             return;
         }
@@ -93,9 +100,10 @@ public class TacokitExportDependenciesProvider implements IBuildExportDependenci
                     .getTalendJobJavaProject(item.getProperty());
             final String output = project.getResourcesFolder().getLocationURI().getPath();
             final Path m2 = findM2Path();
-            final Path resMvnRepo = Paths.get(output, "MAVEN-INF", "repository");
+            final Path resM2 = Paths.get(output, "MAVEN-INF", "repository");
             final Path coordinates = Paths.get(output, "TALEND-INF", "plugins.properties");
-            Files.createDirectories(resMvnRepo);
+            exportFileResource.addResource("TALEND-INF/", coordinates.toUri().toURL());
+            Files.createDirectories(resM2);
             if (Files.exists(coordinates)) {
                 Files.readAllLines(coordinates).stream()
                         .filter(line -> !line.matches("^\\s?#"))
@@ -106,46 +114,102 @@ public class TacokitExportDependenciesProvider implements IBuildExportDependenci
             } else {
                 Files.createDirectories(coordinates.getParent());
             }
+            // feeding MAVEN-INF repository
             plugins.forEach((plugin, location) -> {
-                LOGGER.debug("[exportDependencies] Adding {} to MAVEN-INF.", plugin);
+                LOG.info("[exportDependencies] Adding {} to MAVEN-INF.", plugin);
                 final Path src = m2.resolve(location);
-                final Path dst = resMvnRepo.resolve(location);
+                final Path dst = resM2.resolve(location);
                 try {
-                    if (!Files.exists(dst.getParent())) {
-                        Files.createDirectories(dst.getParent());
-                    }
-                    if (!Files.exists(dst)) {
-                        Files.copy(src, dst);
-                    }
-                } catch (IOException e) {
-                    LOGGER.error("[exportDependencies] Error occurred during artifact copy:", e);
+                    // first cp component jar
+                    copyJar(src, dst, exportFileResource);
+                    // then find deps for current plugin : This is definitely needed for the microservice case and may
+                    // help in future to avoid classes collisions as it may happen with azure-dls-gen2 for instance!
+                    // TODO: remove components' only deps from container's classpath and keep 'em in MAVEN-INF only.
+                    // This may be not so easy but it would be required really soon.
+                    JarFile jar = new JarFile(src.toFile());
+                    final JarEntry entry = jar.getJarEntry("TALEND-INF/dependencies.txt");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(jar.getInputStream(entry)));
+                    reader.lines()
+                            .filter(l -> !l.endsWith(":test"))
+                            .map(this::gavToJar)
+                            .peek(dep -> LOG.debug("[exportDependencies] Copying dependency {} to MAVEN-INF.", dep))
+                            .forEach(dep -> copyJar(m2.resolve(dep), resM2.resolve(dep), exportFileResource));
+                    reader.close();
+                    jar.close();
+                } catch (IOException | IllegalStateException e) {
+                    LOG.error("[exportDependencies] Error occurred during artifact copy:", e);
                     ExceptionHandler.process(e);
                 }
             });
+            // Finalize by writing our plugins.properties
             final StringBuffer coord = new StringBuffer("# component-runtime components coordinates:\n");
             plugins.forEach((k, v) -> coord.append(String.format("%s = %s\n", k, v)));
-            Files.copy(new BufferedInputStream(new ByteArrayInputStream(coord.toString().getBytes())), coordinates, REPLACE_EXISTING);
+            Files.copy(new BufferedInputStream(new ByteArrayInputStream(coord.toString()
+                    .getBytes())), coordinates, REPLACE_EXISTING);
+            // For microservice m2 extraction, not necessary for real OSGi bundle
             System.setProperty("talend.component.manager.components.present", "true");
-            LOGGER.debug("[exportDependencies] Finished MAVEN-INF feeding.");
+            LOG.info("[exportDependencies] Finished MAVEN-INF feeding.");
         } catch (Exception e) {
-            LOGGER.error("[exportDependencies] Error occurred:", e);
+            LOG.error("[exportDependencies] Error occurred:", e);
             ExceptionHandler.process(e);
         }
     }
 
     /**
-     * translates a GAV (ie com.tutorial:tutorial-component:0.0.1) to a maven repository path (ie com/tutorial/tutorial-component/0.0.1/tutorial-component-0.0.1.jar)
+     * Copy a jar and update export resources.
      *
-     * @param gav GroupId ArtifactId Version
-     *
-     * @return maven path
+     * @param source             m2 jar
+     * @param destination        MAVEN-INF destination jar
+     * @param exportFileResource file resources for job export build
      */
-    public static String gavToJar(String gav) {
-        final String jar = "%s/%s/%s/%s-%s.jar";
-        final String[] split = gav.split(":"); // GAV ie com.tutorial:tutorial-component:0.0.1
-        return String.format(jar, split[0].replaceAll("\\.", "/"), split[1], split[2], split[1], split[2]);
+    private void copyJar(Path source, Path destination, ExportFileResource exportFileResource) {
+        try {
+            if (!Files.exists(destination.getParent())) {
+                Files.createDirectories(destination.getParent());
+            }
+            if (!Files.exists(destination)) {
+                Files.copy(source, destination);
+            }
+            exportFileResource.addResource(destination.getParent().toString()
+                    .substring(destination.getParent().toString().indexOf("MAVEN-INF/")), destination.toUri().toURL());
+        } catch (IOException e) {
+            LOG.error("[copyJar] Something went wrong during jar copying...", e);
+            throw new IllegalStateException(e);
+        }
     }
 
+    /**
+     * Translates a GAV (ie com.tutorial:tutorial-component:0.0.1) to a maven repository path (ie com/tutorial/tutorial-component/0.0.1/tutorial-component-0.0.1.jar).
+     *
+     * @param gav GroupId ArtifactId Version. The GAV may have the following forms:
+     *            com.tutorial:tutorial-component:0.0.1
+     *            or
+     *            com.tutorial:tutorial-component:jar:0.0.1:compile
+     *
+     * @return a translated maven path
+     */
+    public String gavToJar(String gav) {
+        final String jarPathFmt = "%s/%s/%s/%s-%s.jar";
+        final String[] segments = gav.split(":");
+        if (segments.length < 3) {
+            throw new IllegalArgumentException("Bad GAV given!"); // TODO improve message
+        }
+        String group = segments[0].replaceAll("\\.", "/");
+        String artifact = segments[1];
+        String version = "";
+        if (segments.length == 3) {
+            version = segments[2];
+        } else {
+            version = segments[3];
+        }
+        return String.format(jarPathFmt, group, artifact, version, artifact, version);
+    }
+
+    /**
+     * Find the maven repository path.
+     *
+     * @return the configured m2 repository path
+     */
     public static Path findM2Path() {
         return Optional.ofNullable(System.getProperty("talend.component.manager.m2.repository"))
                 .map(Paths::get)
