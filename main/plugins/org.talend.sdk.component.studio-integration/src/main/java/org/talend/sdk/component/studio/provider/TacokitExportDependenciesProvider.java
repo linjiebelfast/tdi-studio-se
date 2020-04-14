@@ -13,6 +13,8 @@
  */
 package org.talend.sdk.component.studio.provider;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -122,7 +124,7 @@ public class TacokitExportDependenciesProvider implements IBuildExportDependenci
             });
             final StringBuffer coord = new StringBuffer("# component-runtime components coordinates:\n");
             plugins.forEach((k, v) -> coord.append(String.format("%s = %s\n", k, v)));
-            Files.copy(new BufferedInputStream(new ByteArrayInputStream(coord.toString().getBytes())), coordinates);
+            Files.copy(new BufferedInputStream(new ByteArrayInputStream(coord.toString().getBytes())), coordinates, REPLACE_EXISTING);
             System.setProperty("talend.component.manager.components.present", "true");
             LOGGER.debug("[exportDependencies] Finished MAVEN-INF feeding.");
         } catch (Exception e) {
