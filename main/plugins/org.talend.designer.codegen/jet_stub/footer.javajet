@@ -687,11 +687,11 @@
 <%
                                     if (isLog4jEnabled) {
 %>
-                                        log.warn(String.format("<%=warningMessageFormat %>", "<%=ctxParam.getName() %>", cantParseToLongException.getMessage()));
+                                        log.warn(String.format("<%=warningMessageFormat %>", "<%=ctxParam.getName() %>", "Can't parse date string: " + e.getMessage() + " and long: " + cantParseToLongException.getMessage()));
 <%
                                     } else {
 %>
-                                        System.err.println(String.format("<%=warningMessageFormat %>", "<%=ctxParam.getName() %>", cantParseToLongException.getMessage()));
+                                        System.err.println(String.format("<%=warningMessageFormat %>", "<%=ctxParam.getName() %>", "Can't parse date string: " + e.getMessage() + " and long: " + cantParseToLongException.getMessage()));
 <%
                                     }
 %>
