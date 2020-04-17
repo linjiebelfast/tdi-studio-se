@@ -119,7 +119,7 @@ class IndexedRecordToRowStructGenerator {
                     org.apache.avro.Schema dynamicFieldSchema_<%=cid%> = dynamicField_<%=cid%>.schema();
 					String dbName = dynamicField_<%=cid%>.getProp("talend.field.dbColumnName");
                     // set name
-                    dynamicMetadata_<%=cid%>.setName(dbName);
+                    dynamicMetadata_<%=cid%>.setName(dynamicField_<%=cid%>.name());
                     // set db name
                     dynamicMetadata_<%=cid%>.setDbName(dbName==null?dynamicField_<%=cid%>.name():dbName);
                     // set nullable
