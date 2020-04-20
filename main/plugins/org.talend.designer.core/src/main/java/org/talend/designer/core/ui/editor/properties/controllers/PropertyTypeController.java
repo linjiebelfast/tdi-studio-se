@@ -319,6 +319,15 @@ public class PropertyTypeController extends AbstractRepositoryController {
         Map<String, LinkRulesItem> repositoryLinkRulesItemMap = null;
         String paramName = (String) button.getData(PARAMETER_NAME);
         IElementParameter param = elem.getElementParameter(paramName);
+        IElementParameter elementParameter = elem.getElementParameter("DBTYPE");//$NON-NLS-1$
+        if (param != null && elementParameter != null) {
+            String repositoryValue = param.getRepositoryValue();
+            String dbTypeValue = (String) elementParameter.getValue();
+            if (repositoryValue != null && !StringUtils.equals(repositoryValue, "DATABASE:" + dbTypeValue)) {//$NON-NLS-1$
+                param.setRepositoryValue("DATABASE:" + dbTypeValue);//$NON-NLS-1$
+            }
+        }
+
         Object data = button.getData(NAME);
         if (data != null && data.equals(REPOSITORY_CHOICE)) {
             IElementParameter dbTypeParam = null;
@@ -663,8 +672,10 @@ public class PropertyTypeController extends AbstractRepositoryController {
         String currentDbType = ((DatabaseConnection) repositoryConnection).getDatabaseType();
         EDatabaseTypeName typeName = EDatabaseTypeName.getTypeFromDbType(currentDbType);
 
-        Command command = new PropertyChangeCommand(elem, property, typeName.getXMLType());
-        compoundCommand.add(command);
+        if (!typeName.getXMLType().equals(elem.getElementParameter(property).getValue())) {
+            Command command = new PropertyChangeCommand(elem, property, typeName.getXMLType());
+            compoundCommand.add(command);
+        }
     }
 
     /*
