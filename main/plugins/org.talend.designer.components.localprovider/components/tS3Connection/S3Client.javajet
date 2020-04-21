@@ -251,9 +251,7 @@
 	        		for(int policyListIndex = 0; policyListIndex < policyListSize; policyListIndex++){
 	        			String policyArn = policyList.get(policyListIndex).get("POLICY_ARN");
 	        %>
-	        			com.amazonaws.services.securitytoken.model.PolicyDescriptorType pdt_<%=cid%> = 
-	        				new com.amazonaws.services.securitytoken.model.PolicyDescriptorType().withArn(<%=policyArn%>);
-	        			policyArnList_<%=cid%>.add(pdt_<%=cid%>);
+	        			policyArnList_<%=cid%>.add(new com.amazonaws.services.securitytoken.model.PolicyDescriptorType().withArn(<%=policyArn%>));
 	        <%
 	        		}
 	        	}
@@ -272,9 +270,7 @@
 	        			String tagValue = tagInfoList.get(tagInfoListIndex).get("TAG_VALUE");
 	        			String tagTransitive = tagInfoList.get(tagInfoListIndex).get("TAG_TRANSITIVE");
 	        %>
-	        			com.amazonaws.services.securitytoken.model.Tag tag_<%=cid%> = 
-	        				new com.amazonaws.services.securitytoken.model.Tag().withKey(<%=tagKey%>).withValue(<%=tagValue%>);
-	        			tagList_<%=cid%>.add(tag_<%=cid%>);
+	        			tagList_<%=cid%>.add(new com.amazonaws.services.securitytoken.model.Tag().withKey(<%=tagKey%>).withValue(<%=tagValue%>));
 	        			
 	        			if("true".equals(<%=tagTransitive%>))
 	        				tranTagKeys_<%=cid%>.add(<%=tagKey%>);
